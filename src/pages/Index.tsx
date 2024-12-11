@@ -17,12 +17,13 @@ const Index = () => {
 
     const newRun: Run = {
       id: uuidv4(),
-      date: new Date(),
+      date: formData.date,
       name: formData.name,
       distance: formData.distance,
       duration,
       pace,
       speed,
+      unit: formData.unit,
     };
 
     setRuns((prev) => [...prev, newRun]);

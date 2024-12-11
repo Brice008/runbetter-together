@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { RunFormData } from "@/types/running";
-import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import {
   Select,
   SelectContent,
@@ -51,7 +50,15 @@ const AddRunForm = ({ onSubmit }: AddRunFormProps) => {
       return;
     }
 
-    onSubmit(formData);
+    // Créer une copie du formData avec la date correctement définie
+    const submissionData = {
+      ...formData,
+      date: new Date(formData.date), // Assure que c'est bien un objet Date
+    };
+
+    onSubmit(submissionData);
+    
+    // Réinitialiser le formulaire
     setFormData({
       name: "",
       distance: 0,
@@ -66,6 +73,14 @@ const AddRunForm = ({ onSubmit }: AddRunFormProps) => {
       title: "Course ajoutée",
       description: "Votre course a été enregistrée avec succès",
     });
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = e.target.value;
+    const newDate = new Date(dateValue);
+    // Ajuster pour le fuseau horaire local
+    newDate.setMinutes(newDate.getMinutes() - newDate.getTimezoneOffset());
+    setFormData({ ...formData, date: newDate });
   };
 
   return (
@@ -87,7 +102,7 @@ const AddRunForm = ({ onSubmit }: AddRunFormProps) => {
             id="date"
             type="date"
             value={formData.date.toISOString().split('T')[0]}
-            onChange={(e) => setFormData({ ...formData, date: new Date(e.target.value) })}
+            onChange={handleDateChange}
             required
           />
         </div>
