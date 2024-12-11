@@ -6,9 +6,11 @@ import RunningStats from "@/components/RunningStats";
 import ProgressChart from "@/components/ProgressChart";
 import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [runs, setRuns] = useState<Run[]>([]);
+  const { toast } = useToast();
 
   const handleAddRun = (formData: RunFormData) => {
     const duration = formData.hours * 3600 + formData.minutes * 60 + formData.seconds;
@@ -27,6 +29,40 @@ const Index = () => {
     };
 
     setRuns((prev) => [...prev, newRun]);
+  };
+
+  const handleDeleteRun = (id: string) => {
+    setRuns((prev) => prev.filter((run) => run.id !== id));
+    toast({
+      title: "Course supprimée",
+      description: "La course a été supprimée avec succès",
+    });
+  };
+
+  const handleUpdateRun = (id: string, updatedRun: Partial<Run>) => {
+    setRuns((prev) =>
+      prev.map((run) => {
+        if (run.id === id) {
+          const duration = updatedRun.duration ?? run.duration;
+          const distance = updatedRun.distance ?? run.distance;
+          const pace = calculatePace(distance, duration);
+          const speed = calculateSpeed(distance, duration);
+
+          return {
+            ...run,
+            ...updatedRun,
+            pace,
+            speed,
+          };
+        }
+        return run;
+      })
+    );
+
+    toast({
+      title: "Course modifiée",
+      description: "La course a été modifiée avec succès",
+    });
   };
 
   return (
@@ -52,7 +88,11 @@ const Index = () => {
       {runs.length > 0 && (
         <div>
           <h2 className="text-2xl font-semibold mb-4">Historique</h2>
-          <RunHistory runs={runs} />
+          <RunHistory 
+            runs={runs} 
+            onDelete={handleDeleteRun}
+            onUpdate={handleUpdateRun}
+          />
         </div>
       )}
     </div>
