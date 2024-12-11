@@ -32,10 +32,10 @@ const RunHistory = ({ runs }: RunHistoryProps) => {
             <TableRow key={run.id}>
               <TableCell>{new Date(run.date).toLocaleDateString()}</TableCell>
               <TableCell>{run.name || "-"}</TableCell>
-              <TableCell>{run.distance.toFixed(2)} km</TableCell>
+              <TableCell>{run.distance.toFixed(2)} {run.unit}</TableCell>
               <TableCell>{formatDuration(run.duration)}</TableCell>
-              <TableCell>{formatPace(run.pace)}</TableCell>
-              <TableCell>{run.speed.toFixed(1)} km/h</TableCell>
+              <TableCell>{formatPace(run.pace, run.unit)}</TableCell>
+              <TableCell>{run.speed.toFixed(1)} {run.unit}/h</TableCell>
             </TableRow>
           ))}
         </TableBody>

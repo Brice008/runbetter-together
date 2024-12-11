@@ -6,6 +6,13 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AddRunFormProps {
   onSubmit: (run: RunFormData) => void;
@@ -19,6 +26,8 @@ const AddRunForm = ({ onSubmit }: AddRunFormProps) => {
     hours: 0,
     minutes: 0,
     seconds: 0,
+    date: new Date(),
+    unit: "km",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -49,6 +58,8 @@ const AddRunForm = ({ onSubmit }: AddRunFormProps) => {
       hours: 0,
       minutes: 0,
       seconds: 0,
+      date: new Date(),
+      unit: "km",
     });
 
     toast({
@@ -71,15 +82,43 @@ const AddRunForm = ({ onSubmit }: AddRunFormProps) => {
         </div>
 
         <div>
-          <Label htmlFor="distance">Distance (km)</Label>
+          <Label htmlFor="date">Date de la course</Label>
           <Input
-            id="distance"
-            type="number"
-            step="0.01"
-            value={formData.distance || ""}
-            onChange={(e) => setFormData({ ...formData, distance: parseFloat(e.target.value) || 0 })}
+            id="date"
+            type="date"
+            value={formData.date.toISOString().split('T')[0]}
+            onChange={(e) => setFormData({ ...formData, date: new Date(e.target.value) })}
             required
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="distance">Distance</Label>
+            <Input
+              id="distance"
+              type="number"
+              step="0.01"
+              value={formData.distance || ""}
+              onChange={(e) => setFormData({ ...formData, distance: parseFloat(e.target.value) || 0 })}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="unit">Unité</Label>
+            <Select
+              value={formData.unit}
+              onValueChange={(value: "km" | "mi") => setFormData({ ...formData, unit: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une unité" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="km">Kilomètres</SelectItem>
+                <SelectItem value="mi">Miles</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4">
