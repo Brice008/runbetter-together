@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import AddRunForm from "@/components/AddRunForm";
 import RunHistory from "@/components/RunHistory";
@@ -8,9 +8,28 @@ import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import { useToast } from "@/hooks/use-toast";
 
+const STORAGE_KEY = "running-tracker-runs";
+
 const Index = () => {
   const [runs, setRuns] = useState<Run[]>([]);
   const { toast } = useToast();
+
+  // Charger les courses depuis le localStorage au démarrage
+  useEffect(() => {
+    const savedRuns = localStorage.getItem(STORAGE_KEY);
+    if (savedRuns) {
+      const parsedRuns = JSON.parse(savedRuns).map((run: Run) => ({
+        ...run,
+        date: new Date(run.date)
+      }));
+      setRuns(parsedRuns);
+    }
+  }, []);
+
+  // Sauvegarder les courses dans le localStorage à chaque modification
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(runs));
+  }, [runs]);
 
   const handleAddRun = (formData: RunFormData) => {
     const duration = formData.hours * 3600 + formData.minutes * 60 + formData.seconds;
@@ -29,6 +48,11 @@ const Index = () => {
     };
 
     setRuns((prev) => [...prev, newRun]);
+    
+    toast({
+      title: "Course ajoutée",
+      description: "La course a été enregistrée avec succès",
+    });
   };
 
   const handleDeleteRun = (id: string) => {
