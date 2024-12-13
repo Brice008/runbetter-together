@@ -92,26 +92,26 @@ const Index = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-bold">Suivi de Course</h1>
+    <div className="container mx-auto p-4 sm:py-8 space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-3xl sm:text-4xl font-bold">Suivi de Course</h1>
         <Link to="/stats">
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Statistiques
           </Button>
         </Link>
       </div>
       
-      <div className="grid gap-8 md:grid-cols-2">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Ajouter une course</h2>
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
+        <div className="order-1 lg:order-none">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4">Ajouter une course</h2>
           <AddRunForm onSubmit={handleAddRun} />
         </div>
         
         {runs.length > 0 && (
           <div>
-            <h2 className="text-2xl font-semibold mb-4">Progression</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">Progression</h2>
             <ProgressChart runs={runs} />
           </div>
         )}
@@ -119,12 +119,16 @@ const Index = () => {
 
       {runs.length > 0 && (
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Historique</h2>
-          <RunHistory 
-            runs={runs} 
-            onDelete={handleDeleteRun}
-            onUpdate={handleUpdateRun}
-          />
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4">Historique</h2>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="min-w-full inline-block align-middle">
+              <RunHistory 
+                runs={runs} 
+                onDelete={handleDeleteRun}
+                onUpdate={handleUpdateRun}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>

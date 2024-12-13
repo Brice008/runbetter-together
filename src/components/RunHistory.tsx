@@ -56,9 +56,9 @@ const RunHistory = ({ runs, onDelete, onUpdate }: RunHistoryProps) => {
             <TableHead>Nom</TableHead>
             <TableHead>Distance</TableHead>
             <TableHead>Durée</TableHead>
-            <TableHead>Allure</TableHead>
-            <TableHead>Vitesse</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="hidden sm:table-cell">Allure</TableHead>
+            <TableHead className="hidden sm:table-cell">Vitesse</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
