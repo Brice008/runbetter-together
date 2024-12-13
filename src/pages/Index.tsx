@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import AddRunForm from "@/components/AddRunForm";
 import RunHistory from "@/components/RunHistory";
-import RunningStats from "@/components/RunningStats";
 import ProgressChart from "@/components/ProgressChart";
 import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import { useToast } from "@/hooks/use-toast";
+import { BarChart3 } from "lucide-react";
 
 const STORAGE_KEY = "running-tracker-runs";
 
@@ -91,9 +93,15 @@ const Index = () => {
 
   return (
     <div className="container mx-auto py-8 space-y-8">
-      <h1 className="text-4xl font-bold text-center mb-8">Suivi de Course</h1>
-      
-      {runs.length > 0 && <RunningStats runs={runs} />}
+      <div className="flex items-center justify-between">
+        <h1 className="text-4xl font-bold">Suivi de Course</h1>
+        <Link to="/stats">
+          <Button variant="outline" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Statistiques
+          </Button>
+        </Link>
+      </div>
       
       <div className="grid gap-8 md:grid-cols-2">
         <div>
