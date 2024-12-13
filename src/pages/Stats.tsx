@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import RunningStats from "@/components/RunningStats";
 import { Run } from "@/types/running";
 import { Link } from "react-router-dom";
@@ -32,7 +33,7 @@ const Stats = () => {
       </div>
       
       {runs.length > 0 ? (
-        <RunHistory runs={runs} />
+        <RunningStats runs={runs} />
       ) : (
         <p className="text-center text-gray-500 py-8">
           Aucune course enregistrée pour le moment
