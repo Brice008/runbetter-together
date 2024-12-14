@@ -8,7 +8,7 @@ import ProgressChart from "@/components/ProgressChart";
 import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import { useToast } from "@/hooks/use-toast";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, TrendingUp } from "lucide-react";
 
 const STORAGE_KEY = "running-tracker-runs";
 
@@ -95,12 +95,20 @@ const Index = () => {
     <div className="container mx-auto p-4 sm:py-8 space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl sm:text-4xl font-bold">Suivi de Course</h1>
-        <Link to="/stats">
-          <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Statistiques
-          </Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Link to="/progress">
+            <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Progression
+            </Button>
+          </Link>
+          <Link to="/stats">
+            <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Statistiques
+            </Button>
+          </Link>
+        </div>
       </div>
       
       <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
