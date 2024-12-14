@@ -52,12 +52,12 @@ const RunHistory = ({ runs, onDelete, onUpdate }: RunHistoryProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Nom</TableHead>
-            <TableHead>Distance</TableHead>
-            <TableHead>Durée</TableHead>
-            <TableHead className="hidden sm:table-cell">Allure</TableHead>
-            <TableHead className="hidden sm:table-cell">Vitesse</TableHead>
+            <TableHead className="whitespace-nowrap">Date</TableHead>
+            <TableHead className="max-w-[120px]">Nom</TableHead>
+            <TableHead className="whitespace-nowrap">Distance</TableHead>
+            <TableHead className="whitespace-nowrap">Durée</TableHead>
+            <TableHead className="whitespace-nowrap">Allure</TableHead>
+            <TableHead className="whitespace-nowrap">Vitesse</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
