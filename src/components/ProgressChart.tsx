@@ -16,16 +16,30 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
     }));
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="-mx-4 sm:mx-0">
+      <CardHeader className="px-4">
         <CardTitle>Progression de la vitesse</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0 sm:p-6">
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <XAxis dataKey="date" />
-              <YAxis />
+            <LineChart 
+              data={data}
+              margin={{ 
+                top: 5,
+                right: 10,
+                left: 0,
+                bottom: 5 
+              }}
+            >
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 12 }}
+                interval="preserveStartEnd"
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+              />
               <Tooltip />
               <Line
                 type="monotone"
