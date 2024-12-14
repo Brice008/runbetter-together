@@ -17,8 +17,8 @@ const RunHistoryRow = ({ run, onEdit, onDelete }: RunHistoryRowProps) => {
       <TableCell className="max-w-[120px] truncate">{run.name || "-"}</TableCell>
       <TableCell className="whitespace-nowrap">{run.distance.toFixed(2)} {run.unit}</TableCell>
       <TableCell className="whitespace-nowrap">{formatDuration(run.duration)}</TableCell>
-      <TableCell className="hidden sm:table-cell whitespace-nowrap">{formatPace(run.pace, run.unit)}</TableCell>
-      <TableCell className="hidden sm:table-cell whitespace-nowrap">{run.speed.toFixed(1)} {run.unit}/h</TableCell>
+      <TableCell className="whitespace-nowrap">{formatPace(run.pace, run.unit)}</TableCell>
+      <TableCell className="whitespace-nowrap">{run.speed.toFixed(1)} {run.unit}/h</TableCell>
       <TableCell>
         <div className="flex gap-1 sm:gap-2 justify-end">
           <Button
