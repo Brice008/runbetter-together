@@ -19,9 +19,11 @@ const Progress = () => {
     }
   }, []);
 
-  const shortRuns = runs.filter(run => run.distance <= 3.50);
-  const mediumRuns = runs.filter(run => run.distance > 3.50 && run.distance <= 5.25);
-  const longRuns = runs.filter(run => run.distance > 5.25 && run.distance <= 7.5);
+  const veryShortRuns = runs.filter(run => run.distance <= 4);
+  const shortRuns = runs.filter(run => run.distance > 4 && run.distance <= 5);
+  const mediumRuns = runs.filter(run => run.distance > 5 && run.distance <= 6);
+  const longRuns = runs.filter(run => run.distance > 6 && run.distance <= 7);
+  const veryLongRuns = runs.filter(run => run.distance > 7);
 
   return (
     <div className="container mx-auto p-4 sm:py-8 space-y-6 sm:space-y-8">
@@ -32,18 +34,28 @@ const Progress = () => {
       
       <div className="space-y-8">
         <ProgressSection 
-          title="Courses courtes (0 - 3,50 km)" 
+          title="Courses très courtes (0 - 4 km)" 
+          runs={veryShortRuns} 
+        />
+        
+        <ProgressSection 
+          title="Courses courtes (4,01 - 5 km)" 
           runs={shortRuns} 
         />
         
         <ProgressSection 
-          title="Courses moyennes (3,51 - 5,25 km)" 
+          title="Courses moyennes (5,01 - 6 km)" 
           runs={mediumRuns} 
         />
-        
+
         <ProgressSection 
-          title="Courses longues (5,26 - 7,5 km)" 
+          title="Courses longues (6,01 - 7 km)" 
           runs={longRuns} 
+        />
+
+        <ProgressSection 
+          title="Courses très longues (> 7 km)" 
+          runs={veryLongRuns} 
         />
 
         {runs.length === 0 && (
