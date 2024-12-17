@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Goal } from "@/types/goals";
+import { calculateSpeed } from "@/utils/calculations";
 
 interface AddGoalDialogProps {
   open: boolean;
@@ -15,17 +16,26 @@ const AddGoalDialog = ({ open, onOpenChange, onSubmit, goal }: AddGoalDialogProp
   const [formData, setFormData] = useState({
     name: "",
     targetDistance: "",
-    targetTime: "",
+    hours: "",
+    minutes: "",
+    seconds: "",
     targetSpeed: "",
     deadline: "",
   });
 
   useEffect(() => {
     if (goal) {
+      const totalSeconds = goal.targetTime || 0;
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
       setFormData({
         name: goal.name,
         targetDistance: goal.targetDistance.toString(),
-        targetTime: goal.targetTime?.toString() || "",
+        hours: hours.toString(),
+        minutes: minutes.toString(),
+        seconds: seconds.toString(),
         targetSpeed: goal.targetSpeed?.toString() || "",
         deadline: goal.deadline ? new Date(goal.deadline).toISOString().split("T")[0] : "",
       });
@@ -33,20 +43,48 @@ const AddGoalDialog = ({ open, onOpenChange, onSubmit, goal }: AddGoalDialogProp
       setFormData({
         name: "",
         targetDistance: "",
-        targetTime: "",
+        hours: "",
+        minutes: "",
+        seconds: "",
         targetSpeed: "",
         deadline: "",
       });
     }
   }, [goal]);
 
+  const calculateTotalSeconds = (h: string, m: string, s: string): number => {
+    const hours = parseInt(h) || 0;
+    const minutes = parseInt(m) || 0;
+    const seconds = parseInt(s) || 0;
+    return hours * 3600 + minutes * 60 + seconds;
+  };
+
+  const updateSpeed = () => {
+    const distance = parseFloat(formData.targetDistance);
+    const totalSeconds = calculateTotalSeconds(formData.hours, formData.minutes, formData.seconds);
+    
+    if (distance && totalSeconds > 0) {
+      const speed = calculateSpeed(distance, totalSeconds);
+      setFormData(prev => ({
+        ...prev,
+        targetSpeed: speed.toFixed(2)
+      }));
+    }
+  };
+
+  useEffect(() => {
+    updateSpeed();
+  }, [formData.targetDistance, formData.hours, formData.minutes, formData.seconds]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const totalSeconds = calculateTotalSeconds(formData.hours, formData.minutes, formData.seconds);
+    
     onSubmit({
       name: formData.name,
       targetDistance: parseFloat(formData.targetDistance),
-      targetTime: formData.targetTime ? parseInt(formData.targetTime) : undefined,
-      targetSpeed: formData.targetSpeed ? parseFloat(formData.targetSpeed) : undefined,
+      targetTime: totalSeconds,
+      targetSpeed: parseFloat(formData.targetSpeed),
       deadline: formData.deadline ? new Date(formData.deadline) : undefined,
     });
   };
@@ -82,27 +120,57 @@ const AddGoalDialog = ({ open, onOpenChange, onSubmit, goal }: AddGoalDialogProp
               required
             />
           </div>
-          <div>
-            <label htmlFor="targetTime" className="block text-sm font-medium mb-1">
-              Temps cible (secondes)
-            </label>
-            <Input
-              id="targetTime"
-              type="number"
-              value={formData.targetTime}
-              onChange={(e) => setFormData({ ...formData, targetTime: e.target.value })}
-            />
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <label htmlFor="hours" className="block text-sm font-medium mb-1">
+                Heures
+              </label>
+              <Input
+                id="hours"
+                type="number"
+                min="0"
+                value={formData.hours}
+                onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
+              />
+            </div>
+            <div>
+              <label htmlFor="minutes" className="block text-sm font-medium mb-1">
+                Minutes
+              </label>
+              <Input
+                id="minutes"
+                type="number"
+                min="0"
+                max="59"
+                value={formData.minutes}
+                onChange={(e) => setFormData({ ...formData, minutes: e.target.value })}
+              />
+            </div>
+            <div>
+              <label htmlFor="seconds" className="block text-sm font-medium mb-1">
+                Secondes
+              </label>
+              <Input
+                id="seconds"
+                type="number"
+                min="0"
+                max="59"
+                value={formData.seconds}
+                onChange={(e) => setFormData({ ...formData, seconds: e.target.value })}
+              />
+            </div>
           </div>
           <div>
             <label htmlFor="targetSpeed" className="block text-sm font-medium mb-1">
-              Vitesse cible (km/h)
+              Vitesse calculée (km/h)
             </label>
             <Input
               id="targetSpeed"
               type="number"
               step="0.1"
               value={formData.targetSpeed}
-              onChange={(e) => setFormData({ ...formData, targetSpeed: e.target.value })}
+              readOnly
+              className="bg-gray-100"
             />
           </div>
           <div>
