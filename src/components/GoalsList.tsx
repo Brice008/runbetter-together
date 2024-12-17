@@ -2,6 +2,7 @@ import { Goal } from "@/types/goals";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, CheckCircle, Circle } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { calculatePace, calculateSpeed, formatPace } from "@/utils/calculations";
 
 interface GoalsListProps {
   goals: Goal[];
@@ -23,59 +24,71 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
     return `${minutes}m ${remainingSeconds}s`;
   };
 
+  const calculateMetrics = (distance: number, time?: number) => {
+    if (!time) return { speed: null, pace: null };
+    const speed = calculateSpeed(distance, time);
+    const pace = calculatePace(distance, time);
+    return { speed, pace };
+  };
+
   return (
     <div className="space-y-4">
       {goals.length === 0 ? (
         <p className="text-center text-gray-500">Aucun objectif défini</p>
       ) : (
-        goals.map((goal) => (
-          <Card key={goal.id} className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
+        goals.map((goal) => {
+          const { speed, pace } = calculateMetrics(goal.targetDistance, goal.targetTime);
+          
+          return (
+            <Card key={goal.id} className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onToggleComplete(goal.id)}
+                    >
+                      {goal.completed ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <Circle className="h-5 w-5" />
+                      )}
+                    </Button>
+                    <h3 className={`text-lg font-semibold ${goal.completed ? "line-through text-gray-500" : ""}`}>
+                      {goal.name}
+                    </h3>
+                  </div>
+                  <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                    <p>Distance : {goal.targetDistance} km</p>
+                    {goal.targetTime && <p>Temps : {formatDuration(goal.targetTime)}</p>}
+                    {speed && <p>Vitesse : {speed.toFixed(2)} km/h</p>}
+                    {pace && <p>Allure : {formatPace(pace)}</p>}
+                    {goal.deadline && (
+                      <p>Date limite : {new Date(goal.deadline).toLocaleDateString()}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onToggleComplete(goal.id)}
+                    onClick={() => onEdit(goal)}
                   >
-                    {goal.completed ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <Circle className="h-5 w-5" />
-                    )}
+                    <Pencil className="h-4 w-4" />
                   </Button>
-                  <h3 className={`text-lg font-semibold ${goal.completed ? "line-through text-gray-500" : ""}`}>
-                    {goal.name}
-                  </h3>
-                </div>
-                <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                  <p>Distance : {goal.targetDistance} km</p>
-                  {goal.targetTime && <p>Temps : {formatDuration(goal.targetTime)}</p>}
-                  {goal.targetSpeed && <p>Vitesse : {goal.targetSpeed.toFixed(2)} km/h</p>}
-                  {goal.deadline && (
-                    <p>Date limite : {new Date(goal.deadline).toLocaleDateString()}</p>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDelete(goal.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(goal)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onDelete(goal.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))
+            </Card>
+          );
+        })
       )}
     </div>
   );
