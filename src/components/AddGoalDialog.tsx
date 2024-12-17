@@ -38,7 +38,6 @@ const AddGoalDialog = ({ open, onOpenChange, onSubmit, goal }: AddGoalDialogProp
           <BasicGoalInputs
             name={formData.name}
             targetDistance={formData.targetDistance}
-            targetSpeed={formData.targetSpeed}
             deadline={formData.deadline}
             onNameChange={(value) => handleFieldChange('name', value)}
             onDistanceChange={(value) => handleFieldChange('targetDistance', value)}
