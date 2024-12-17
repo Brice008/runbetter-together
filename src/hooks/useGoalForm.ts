@@ -49,23 +49,6 @@ export const useGoalForm = (goal: Goal | null) => {
     return hours * 3600 + minutes * 60 + seconds;
   };
 
-  const updateSpeed = () => {
-    const distance = parseFloat(formData.targetDistance);
-    const totalSeconds = calculateTotalSeconds(formData.hours, formData.minutes, formData.seconds);
-    
-    if (distance && totalSeconds > 0) {
-      const speed = calculateSpeed(distance, totalSeconds);
-      setFormData(prev => ({
-        ...prev,
-        targetSpeed: speed.toFixed(2)
-      }));
-    }
-  };
-
-  useEffect(() => {
-    updateSpeed();
-  }, [formData.targetDistance, formData.hours, formData.minutes, formData.seconds]);
-
   const handleFieldChange = (field: keyof GoalFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };

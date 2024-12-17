@@ -51,7 +51,7 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
                 <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                   <p>Distance : {goal.targetDistance} km</p>
                   {goal.targetTime && <p>Temps : {formatDuration(goal.targetTime)}</p>}
-                  {goal.targetSpeed && <p>Vitesse : {goal.targetSpeed} km/h</p>}
+                  {goal.targetSpeed && <p>Vitesse : {goal.targetSpeed.toFixed(2)} km/h</p>}
                   {goal.deadline && (
                     <p>Date limite : {new Date(goal.deadline).toLocaleDateString()}</p>
                   )}

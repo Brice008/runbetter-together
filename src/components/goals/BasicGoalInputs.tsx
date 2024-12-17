@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 interface BasicGoalInputsProps {
   name: string;
   targetDistance: string;
-  targetSpeed: string;
   deadline: string;
   onNameChange: (value: string) => void;
   onDistanceChange: (value: string) => void;
@@ -13,7 +12,6 @@ interface BasicGoalInputsProps {
 const BasicGoalInputs = ({
   name,
   targetDistance,
-  targetSpeed,
   deadline,
   onNameChange,
   onDistanceChange,
@@ -43,19 +41,6 @@ const BasicGoalInputs = ({
           value={targetDistance}
           onChange={(e) => onDistanceChange(e.target.value)}
           required
-        />
-      </div>
-      <div>
-        <label htmlFor="targetSpeed" className="block text-sm font-medium mb-1">
-          Vitesse calculée (km/h)
-        </label>
-        <Input
-          id="targetSpeed"
-          type="number"
-          step="0.1"
-          value={targetSpeed}
-          readOnly
-          className="bg-gray-100"
         />
       </div>
       <div>
