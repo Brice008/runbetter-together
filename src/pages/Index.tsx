@@ -8,7 +8,7 @@ import ProgressChart from "@/components/ProgressChart";
 import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import { useToast } from "@/hooks/use-toast";
-import { BarChart3, TrendingUp } from "lucide-react";
+import { BarChart3, TrendingUp, Target } from "lucide-react";
 
 const STORAGE_KEY = "running-tracker-runs";
 
@@ -106,6 +106,12 @@ const Index = () => {
             <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Statistiques
+            </Button>
+          </Link>
+          <Link to="/goals">
+            <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
+              <Target className="h-4 w-4" />
+              Objectifs
             </Button>
           </Link>
         </div>
