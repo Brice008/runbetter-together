@@ -6,6 +6,16 @@ import AddGoalDialog from "@/components/AddGoalDialog";
 import GoalsList from "@/components/GoalsList";
 import { Goal } from "@/types/goals";
 import BackButton from "@/components/BackButton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const STORAGE_KEY = "running-tracker-goals";
 
@@ -13,6 +23,7 @@ const Goals = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -64,6 +75,7 @@ const Goals = () => {
 
   const handleDeleteGoal = (id: string) => {
     setGoals((prev) => prev.filter((goal) => goal.id !== id));
+    setGoalToDelete(null);
     toast({
       title: "Objectif supprimé",
       description: "L'objectif a été supprimé avec succès",
@@ -84,6 +96,9 @@ const Goals = () => {
     });
   };
 
+  const activeGoals = goals.filter(goal => !goal.completed);
+  const completedGoals = goals.filter(goal => goal.completed);
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
@@ -94,15 +109,33 @@ const Goals = () => {
         </Button>
       </div>
 
-      <GoalsList
-        goals={goals}
-        onDelete={handleDeleteGoal}
-        onEdit={(goal) => {
-          setEditingGoal(goal);
-          setIsAddDialogOpen(true);
-        }}
-        onToggleComplete={handleToggleComplete}
-      />
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Objectifs en cours</h2>
+          <GoalsList
+            goals={activeGoals}
+            onDelete={(id) => setGoalToDelete(id)}
+            onEdit={(goal) => {
+              setEditingGoal(goal);
+              setIsAddDialogOpen(true);
+            }}
+            onToggleComplete={handleToggleComplete}
+          />
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Objectifs réussis</h2>
+          <GoalsList
+            goals={completedGoals}
+            onDelete={(id) => setGoalToDelete(id)}
+            onEdit={(goal) => {
+              setEditingGoal(goal);
+              setIsAddDialogOpen(true);
+            }}
+            onToggleComplete={handleToggleComplete}
+          />
+        </div>
+      </div>
 
       <AddGoalDialog
         open={isAddDialogOpen}
@@ -110,6 +143,23 @@ const Goals = () => {
         onSubmit={editingGoal ? handleEditGoal : handleAddGoal}
         goal={editingGoal}
       />
+
+      <AlertDialog open={!!goalToDelete} onOpenChange={() => setGoalToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action ne peut pas être annulée. Cet objectif sera définitivement supprimé.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => goalToDelete && handleDeleteGoal(goalToDelete)}>
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
