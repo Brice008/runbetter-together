@@ -6,6 +6,7 @@ import AddGoalDialog from "@/components/AddGoalDialog";
 import GoalsList from "@/components/GoalsList";
 import { Goal } from "@/types/goals";
 import BackButton from "@/components/BackButton";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ const Goals = () => {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const savedGoals = localStorage.getItem(STORAGE_KEY);
@@ -105,18 +107,25 @@ const Goals = () => {
   const completedGoals = goals.filter(goal => goal.completed);
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <BackButton />
-        <h1 className="text-3xl font-bold">Objectifs</h1>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
+    <div className={`container mx-auto ${isMobile ? 'px-2' : 'p-4'} space-y-6`}>
+      <div className={`flex ${isMobile ? 'flex-col gap-2' : 'items-center justify-between'}`}>
+        <div className={`flex ${isMobile ? 'justify-between w-full' : ''} items-center`}>
+          <BackButton />
+          <h1 className={`text-2xl ${isMobile ? '' : 'text-3xl'} font-bold`}>Objectifs</h1>
+        </div>
+        <Button 
+          onClick={() => setIsAddDialogOpen(true)}
+          className={`${isMobile ? 'w-full' : ''}`}
+        >
           Ajouter un objectif
         </Button>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Objectifs en cours</h2>
+          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold mb-4`}>
+            Objectifs en cours
+          </h2>
           <GoalsList
             goals={activeGoals}
             onDelete={(id) => setGoalToDelete(id)}
@@ -129,7 +138,9 @@ const Goals = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Objectifs réussis</h2>
+          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold mb-4`}>
+            Objectifs réussis
+          </h2>
           <GoalsList
             goals={completedGoals}
             onDelete={(id) => setGoalToDelete(id)}
