@@ -4,7 +4,6 @@ import { Pencil, Trash2, CheckCircle, Circle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { calculatePace, calculateSpeed, formatPace } from "@/utils/calculations";
 import { Input } from "./ui/input";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface GoalsListProps {
   goals: Goal[];
@@ -14,8 +13,6 @@ interface GoalsListProps {
 }
 
 const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps) => {
-  const isMobile = useIsMobile();
-
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "Non défini";
     const hours = Math.floor(seconds / 3600);
@@ -48,27 +45,26 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
           const { speed, pace } = calculateMetrics(goal.targetDistance, goal.targetTime);
           
           return (
-            <Card key={goal.id} className={`p-3 ${isMobile ? 'text-sm' : 'p-4'}`}>
-              <div className={`flex items-start ${isMobile ? 'flex-col gap-2' : 'justify-between'}`}>
-                <div className="space-y-2 w-full">
+            <Card key={goal.id} className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
-                      size={isMobile ? "sm" : "icon"}
+                      size="icon"
                       onClick={() => onToggleComplete(goal.id)}
-                      className={isMobile ? "p-1" : ""}
                     >
                       {goal.completed ? (
-                        <CheckCircle className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-green-500`} />
+                        <CheckCircle className="h-5 w-5 text-green-500" />
                       ) : (
-                        <Circle className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
+                        <Circle className="h-5 w-5" />
                       )}
                     </Button>
-                    <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold ${goal.completed ? "line-through text-gray-500" : ""}`}>
+                    <h3 className={`text-lg font-semibold ${goal.completed ? "line-through text-gray-500" : ""}`}>
                       {goal.name}
                     </h3>
                   </div>
-                  <div className={`space-y-1 ${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-300`}>
+                  <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                     <p>Distance : {goal.targetDistance} km</p>
                     {goal.targetTime && <p>Temps : {formatDuration(goal.targetTime)}</p>}
                     {speed && <p>Vitesse : {speed.toFixed(2)} km/h</p>}
@@ -77,33 +73,33 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
                       <p>Date limite : {new Date(goal.deadline).toLocaleDateString()}</p>
                     )}
                     {goal.completed && (
-                      <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} gap-2`}>
+                      <div className="flex items-center gap-2">
                         <label htmlFor={`completedAt-${goal.id}`}>Date de réalisation :</label>
                         <Input
                           id={`completedAt-${goal.id}`}
                           type="date"
                           value={goal.completedAt ? new Date(goal.completedAt).toISOString().split('T')[0] : ''}
                           onChange={(e) => handleCompletedDateChange(goal, e.target.value)}
-                          className={`${isMobile ? 'w-full' : 'w-auto'}`}
+                          className="w-auto"
                         />
                       </div>
                     )}
                   </div>
                 </div>
-                <div className={`flex gap-2 ${isMobile ? 'w-full justify-end' : ''}`}>
+                <div className="flex gap-2">
                   <Button
                     variant="ghost"
-                    size={isMobile ? "sm" : "icon"}
+                    size="icon"
                     onClick={() => onEdit(goal)}
                   >
-                    <Pencil className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                    <Pencil className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
-                    size={isMobile ? "sm" : "icon"}
+                    size="icon"
                     onClick={() => onDelete(goal.id)}
                   >
-                    <Trash2 className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
