@@ -6,4 +6,5 @@ export interface Goal {
   targetSpeed?: number;
   completed: boolean;
   deadline?: Date;
+  completedAt?: Date;
 }

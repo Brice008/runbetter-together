@@ -32,6 +32,7 @@ const Goals = () => {
       const parsedGoals = JSON.parse(savedGoals).map((goal: Goal) => ({
         ...goal,
         deadline: goal.deadline ? new Date(goal.deadline) : undefined,
+        completedAt: goal.completedAt ? new Date(goal.completedAt) : undefined,
       }));
       setGoals(parsedGoals);
     }
@@ -82,11 +83,15 @@ const Goals = () => {
     });
   };
 
-  const handleToggleComplete = (id: string) => {
+  const handleToggleComplete = (id: string, completedAt?: Date) => {
     setGoals((prev) =>
       prev.map((goal) =>
         goal.id === id
-          ? { ...goal, completed: !goal.completed }
+          ? {
+              ...goal,
+              completed: completedAt ? true : !goal.completed,
+              completedAt: completedAt || (goal.completed ? undefined : new Date()),
+            }
           : goal
       )
     );

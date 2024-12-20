@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, CheckCircle, Circle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { calculatePace, calculateSpeed, formatPace } from "@/utils/calculations";
+import { Input } from "./ui/input";
 
 interface GoalsListProps {
   goals: Goal[];
   onDelete: (id: string) => void;
   onEdit: (goal: Goal) => void;
-  onToggleComplete: (id: string) => void;
+  onToggleComplete: (id: string, completedAt?: Date) => void;
 }
 
 const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps) => {
@@ -29,6 +30,10 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
     const speed = calculateSpeed(distance, time);
     const pace = calculatePace(distance, time);
     return { speed, pace };
+  };
+
+  const handleCompletedDateChange = (goal: Goal, date: string) => {
+    onToggleComplete(goal.id, new Date(date));
   };
 
   return (
@@ -66,6 +71,18 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
                     {pace && <p>Allure : {formatPace(pace)}</p>}
                     {goal.deadline && (
                       <p>Date limite : {new Date(goal.deadline).toLocaleDateString()}</p>
+                    )}
+                    {goal.completed && (
+                      <div className="flex items-center gap-2">
+                        <label htmlFor={`completedAt-${goal.id}`}>Date de réalisation :</label>
+                        <Input
+                          id={`completedAt-${goal.id}`}
+                          type="date"
+                          value={goal.completedAt ? new Date(goal.completedAt).toISOString().split('T')[0] : ''}
+                          onChange={(e) => handleCompletedDateChange(goal, e.target.value)}
+                          className="w-auto"
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
