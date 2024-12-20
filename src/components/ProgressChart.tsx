@@ -89,7 +89,8 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                 dataKey="speed"
                 stroke="#3B82F6"
                 strokeWidth={2}
-                dot={{ fill: "#3B82F6" }}
+                dot={false}
+                activeDot={{ r: 6, fill: "#3B82F6" }}
                 name="Vitesse"
               />
               <Line
@@ -98,7 +99,8 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                 dataKey="distance"
                 stroke="#10B981"
                 strokeWidth={2}
-                dot={{ fill: "#10B981" }}
+                dot={false}
+                activeDot={{ r: 6, fill: "#10B981" }}
                 name="Distance"
               />
             </LineChart>
