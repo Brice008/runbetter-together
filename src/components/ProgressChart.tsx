@@ -12,8 +12,8 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
     .map((run) => ({
       date: new Date(run.date).toLocaleDateString(),
       speed: parseFloat(run.speed.toFixed(1)),
+      distance: parseFloat(run.distance.toFixed(2)),
       pace: run.pace,
-      distance: run.distance,
       duration: run.duration,
     }));
 
@@ -35,7 +35,7 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
         <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
           <p className="font-semibold mb-1">{label}</p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Distance: {data.distance.toFixed(2)} km
+            Distance: {data.distance} km
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Durée: {formatDuration(data.duration)}
@@ -52,7 +52,7 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
   return (
     <Card className="-mx-4 sm:mx-0">
       <CardHeader className="px-4">
-        <CardTitle>Progression de la vitesse</CardTitle>
+        <CardTitle>Progression</CardTitle>
       </CardHeader>
       <CardContent className="p-0 sm:p-6">
         <div className="h-[300px] w-full">
@@ -72,15 +72,34 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                 interval="preserveStartEnd"
               />
               <YAxis 
+                yAxisId="left"
                 tick={{ fontSize: 12 }}
+                domain={['auto', 'auto']}
+              />
+              <YAxis 
+                yAxisId="right"
+                orientation="right"
+                tick={{ fontSize: 12 }}
+                domain={['auto', 'auto']}
               />
               <Tooltip content={<CustomTooltip />} />
               <Line
+                yAxisId="left"
                 type="monotone"
                 dataKey="speed"
                 stroke="#3B82F6"
                 strokeWidth={2}
                 dot={{ fill: "#3B82F6" }}
+                name="Vitesse"
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="distance"
+                stroke="#10B981"
+                strokeWidth={2}
+                dot={{ fill: "#10B981" }}
+                name="Distance"
               />
             </LineChart>
           </ResponsiveContainer>
