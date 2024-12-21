@@ -14,7 +14,7 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
   const [showDistance, setShowDistance] = useState(true);
 
   const data = runs
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .map((run) => ({
       date: new Date(run.date).toLocaleDateString(),
       speed: parseFloat(run.speed.toFixed(1)),
@@ -75,6 +75,8 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                   dot={false}
                   activeDot={{ r: 6, fill: "#3B82F6" }}
                   name="Vitesse"
+                  animationDuration={1000}
+                  animationBegin={0}
                 />
               )}
               {showDistance && (
@@ -87,6 +89,8 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                   dot={false}
                   activeDot={{ r: 6, fill: "#10B981" }}
                   name="Distance"
+                  animationDuration={1000}
+                  animationBegin={0}
                 />
               )}
             </LineChart>
