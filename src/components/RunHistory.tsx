@@ -47,6 +47,11 @@ const RunHistory = ({ runs, onDelete, onUpdate }: RunHistoryProps) => {
     }
   };
 
+  // Sort runs by date (most recent first)
+  const sortedRuns = [...runs].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -62,7 +67,7 @@ const RunHistory = ({ runs, onDelete, onUpdate }: RunHistoryProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {runs.map((run) => (
+          {sortedRuns.map((run) => (
             <RunHistoryRow
               key={run.id}
               run={run}
