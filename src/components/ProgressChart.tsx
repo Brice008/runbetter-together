@@ -77,6 +77,7 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                   name="Vitesse"
                   animationDuration={1000}
                   animationBegin={0}
+                  isAnimationActive={true}
                 />
               )}
               {showDistance && (
@@ -91,6 +92,7 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                   name="Distance"
                   animationDuration={1000}
                   animationBegin={0}
+                  isAnimationActive={true}
                 />
               )}
             </LineChart>
