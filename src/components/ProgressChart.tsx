@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TrendingUp, ArrowUp } from "lucide-react";
 import { Run } from "@/types/running";
+import ChartControls from "./ChartControls";
+import CustomChartTooltip from "./CustomChartTooltip";
 
 interface ProgressChartProps {
   runs: Run[];
@@ -23,63 +23,17 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
       duration: run.duration,
     }));
 
-  const formatDuration = (duration: number) => {
-    const hours = Math.floor(duration / 3600);
-    const minutes = Math.floor((duration % 3600) / 60);
-    const seconds = duration % 60;
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes}m ${seconds}s`;
-    }
-    return `${minutes}m ${seconds}s`;
-  };
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length > 0) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-          <p className="font-semibold mb-1">{label}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Distance: {data.distance} km
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Durée: {formatDuration(data.duration)}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Vitesse: {data.speed} km/h
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <Card className="-mx-4 sm:mx-0">
       <CardHeader className="px-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <CardTitle>Progression</CardTitle>
-          <div className="flex gap-2">
-            <Button
-              variant={showSpeed ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowSpeed(!showSpeed)}
-              className="gap-2"
-            >
-              <ArrowUp className="h-4 w-4" />
-              Vitesse
-            </Button>
-            <Button
-              variant={showDistance ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowDistance(!showDistance)}
-              className="gap-2"
-            >
-              <TrendingUp className="h-4 w-4" />
-              Distance
-            </Button>
-          </div>
+          <ChartControls
+            showSpeed={showSpeed}
+            showDistance={showDistance}
+            onToggleSpeed={() => setShowSpeed(!showSpeed)}
+            onToggleDistance={() => setShowDistance(!showDistance)}
+          />
         </div>
       </CardHeader>
       <CardContent className="p-0 sm:p-6">
@@ -110,7 +64,7 @@ const ProgressChart = ({ runs }: ProgressChartProps) => {
                 tick={{ fontSize: 12 }}
                 domain={['auto', 'auto']}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomChartTooltip />} />
               {showSpeed && (
                 <Line
                   yAxisId="left"
