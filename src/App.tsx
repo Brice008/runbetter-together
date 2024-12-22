@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Stats from "./pages/Stats";
 import Progress from "./pages/Progress";
 import Goals from "./pages/Goals";
+import Calendar from "./pages/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/stats" element={<Stats />} />
           <Route path="/progress" element={<Progress />} />
           <Route path="/goals" element={<Goals />} />
+          <Route path="/calendar" element={<Calendar />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
