@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import AddRunForm from "@/components/AddRunForm";
 import RunHistory from "@/components/RunHistory";
 import ProgressChart from "@/components/ProgressChart";
+import RunCalendar from "@/components/RunCalendar";
 import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import { useToast } from "@/hooks/use-toast";
@@ -94,7 +95,10 @@ const Index = () => {
   return (
     <div className="container mx-auto p-4 sm:py-8 space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-3xl sm:text-4xl font-bold">Suivi de Course</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl sm:text-4xl font-bold">Suivi de Course</h1>
+          <RunCalendar runs={runs} />
+        </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <Link to="/progress">
             <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
