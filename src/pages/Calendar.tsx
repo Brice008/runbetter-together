@@ -1,82 +1,102 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
+import AddActivityForm from "@/components/AddActivityForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface Activity {
   id: string;
   date: Date;
   type: string;
-  name: string;
   duration: number;
 }
 
 const STORAGE_KEY = "sports-activities";
+const RUNNING_STORAGE_KEY = "running-tracker-runs";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [activities, setActivities] = useState<Activity[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved).map((activity: any) => ({
-      ...activity,
-      date: new Date(activity.date)
-    })) : [];
-  });
-  const [activityType, setActivityType] = useState("musculation");
-  const [activityName, setActivityName] = useState("");
-  const [duration, setDuration] = useState("");
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const { toast } = useToast();
 
-  // Sauvegarder les activités dans le localStorage
-  const saveActivities = (newActivities: Activity[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newActivities));
-    setActivities(newActivities);
-  };
-
-  const handleAddActivity = () => {
-    if (!date || !activityName || !duration) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newActivity: Activity = {
-      id: crypto.randomUUID(),
-      date,
-      type: activityType,
-      name: activityName,
-      duration: parseInt(duration),
+  // Charger les activités depuis le localStorage au démarrage
+  useEffect(() => {
+    const loadActivities = () => {
+      const savedActivities = localStorage.getItem(STORAGE_KEY);
+      if (savedActivities) {
+        const parsedActivities = JSON.parse(savedActivities).map((activity: any) => ({
+          ...activity,
+          date: new Date(activity.date)
+        }));
+        setActivities(parsedActivities);
+      }
     };
 
-    const newActivities = [...activities, newActivity];
-    saveActivities(newActivities);
+    const loadRunningActivities = () => {
+      const savedRuns = localStorage.getItem(RUNNING_STORAGE_KEY);
+      if (savedRuns) {
+        const parsedRuns = JSON.parse(savedRuns).map((run: any) => ({
+          id: run.id,
+          date: new Date(run.date),
+          type: "cardio",
+          duration: Math.round(run.duration / 60), // Convertir les secondes en minutes
+        }));
+        
+        // Fusionner avec les activités existantes en évitant les doublons
+        setActivities(prev => {
+          const existingIds = new Set(prev.map(a => a.id));
+          const newRuns = parsedRuns.filter(run => !existingIds.has(run.id));
+          return [...prev, ...newRuns];
+        });
+      }
+    };
 
+    loadActivities();
+    loadRunningActivities();
+  }, []);
+
+  // Sauvegarder les activités dans le localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
+  }, [activities]);
+
+  const handleAddActivity = (newActivity: Omit<Activity, 'id'>) => {
+    const activityWithId = {
+      ...newActivity,
+      id: crypto.randomUUID(),
+    };
+
+    setActivities(prev => [...prev, activityWithId]);
+    
     toast({
       title: "Activité ajoutée",
       description: "L'activité a été ajoutée avec succès",
     });
+  };
 
-    // Reset form
-    setActivityName("");
-    setDuration("");
+  const handleUpdateActivity = (updatedActivity: Omit<Activity, 'id'>) => {
+    if (!editingActivity) return;
+
+    setActivities(prev =>
+      prev.map(activity =>
+        activity.id === editingActivity.id
+          ? { ...updatedActivity, id: activity.id }
+          : activity
+      )
+    );
+
+    setEditingActivity(null);
+    
+    toast({
+      title: "Activité modifiée",
+      description: "L'activité a été modifiée avec succès",
+    });
   };
 
   const handleDeleteActivity = (id: string) => {
-    const newActivities = activities.filter(activity => activity.id !== id);
-    saveActivities(newActivities);
+    setActivities(prev => prev.filter(activity => activity.id !== id));
     
     toast({
       title: "Activité supprimée",
@@ -113,46 +133,17 @@ const Calendar = () => {
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-6">
           <div className="rounded-lg border p-4">
-            <h2 className="text-xl font-semibold mb-4">Ajouter une activité</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Type d'activité</Label>
-                <Select value={activityType} onValueChange={setActivityType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="musculation">Musculation</SelectItem>
-                    <SelectItem value="abdos">Abdominaux</SelectItem>
-                    <SelectItem value="cardio">Cardio</SelectItem>
-                    <SelectItem value="autre">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Nom de l'activité</Label>
-                <Input
-                  value={activityName}
-                  onChange={(e) => setActivityName(e.target.value)}
-                  placeholder="Ex: Séance jambes"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Durée (minutes)</Label>
-                <Input
-                  type="number"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  placeholder="Ex: 45"
-                />
-              </div>
-
-              <Button onClick={handleAddActivity} className="w-full">
-                Ajouter l'activité
-              </Button>
-            </div>
+            <h2 className="text-xl font-semibold mb-4">
+              {editingActivity ? "Modifier une activité" : "Ajouter une activité"}
+            </h2>
+            {date && (
+              <AddActivityForm
+                selectedDate={date}
+                onSubmit={editingActivity ? handleUpdateActivity : handleAddActivity}
+                editActivity={editingActivity || undefined}
+                onCancel={editingActivity ? () => setEditingActivity(null) : undefined}
+              />
+            )}
           </div>
 
           {date && (
@@ -172,21 +163,28 @@ const Calendar = () => {
                       key={activity.id}
                       className="flex items-center justify-between rounded-lg border p-3"
                     >
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">
-                          {activity.name}
-                        </p>
+                      <div>
+                        <p className="font-medium">{activity.type}</p>
                         <p className="text-sm text-muted-foreground">
-                          {activity.type} - {activity.duration} minutes
+                          {activity.duration} minutes
                         </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteActivity(activity.id)}
-                      >
-                        Supprimer
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingActivity(activity)}
+                        >
+                          Modifier
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteActivity(activity.id)}
+                        >
+                          Supprimer
+                        </Button>
+                      </div>
                     </div>
                   ))}
               </div>
