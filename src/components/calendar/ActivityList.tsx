@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Activity } from "@/hooks/useActivities";
 import { useActivityStore } from "@/stores/activityStore";
-import { Dumbbell, Timer, Run } from "lucide-react";
+import { Dumbbell, Timer, Running } from "lucide-react";
 
 interface ActivityListProps {
   selectedDate: Date | undefined;
@@ -17,7 +17,7 @@ const ActivityList = ({ selectedDate }: ActivityListProps) => {
       case "abdos":
         return <Timer className="h-4 w-4" />;
       case "cardio":
-        return <Run className="h-4 w-4" />;
+        return <Running className="h-4 w-4" />;
       default:
         return null;
     }
