@@ -12,22 +12,39 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
-import { Activity } from "@/hooks/useActivities";
-import { Dumbbell, Timer } from "lucide-react";
-import { useRunStore } from "@/stores/runStore";
-import { useActivityStore } from "@/stores/activityStore";
+
+interface Activity {
+  id: string;
+  date: Date;
+  type: string;
+  name: string;
+  duration: number;
+}
+
+const STORAGE_KEY = "sports-activities";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [activities, setActivities] = useState<Activity[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved).map((activity: any) => ({
+      ...activity,
+      date: new Date(activity.date)
+    })) : [];
+  });
   const [activityType, setActivityType] = useState("musculation");
-  const [hours, setHours] = useState("");
-  const [minutes, setMinutes] = useState("");
+  const [activityName, setActivityName] = useState("");
+  const [duration, setDuration] = useState("");
   const { toast } = useToast();
-  const runs = useRunStore(state => state.runs);
-  const { activities, addActivity, deleteActivity } = useActivityStore();
+
+  // Sauvegarder les activités dans le localStorage
+  const saveActivities = (newActivities: Activity[]) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newActivities));
+    setActivities(newActivities);
+  };
 
   const handleAddActivity = () => {
-    if (!date || (!hours && !minutes)) {
+    if (!date || !activityName || !duration) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs",
@@ -36,13 +53,16 @@ const Calendar = () => {
       return;
     }
 
-    const totalMinutes = (parseInt(hours) || 0) * 60 + (parseInt(minutes) || 0);
-
-    addActivity({
+    const newActivity: Activity = {
+      id: crypto.randomUUID(),
       date,
       type: activityType,
-      duration: totalMinutes,
-    });
+      name: activityName,
+      duration: parseInt(duration),
+    };
+
+    const newActivities = [...activities, newActivity];
+    saveActivities(newActivities);
 
     toast({
       title: "Activité ajoutée",
@@ -50,8 +70,18 @@ const Calendar = () => {
     });
 
     // Reset form
-    setHours("");
-    setMinutes("");
+    setActivityName("");
+    setDuration("");
+  };
+
+  const handleDeleteActivity = (id: string) => {
+    const newActivities = activities.filter(activity => activity.id !== id);
+    saveActivities(newActivities);
+    
+    toast({
+      title: "Activité supprimée",
+      description: "L'activité a été supprimée avec succès",
+    });
   };
 
   // Créer un Set des dates où il y a eu des activités
@@ -71,17 +101,6 @@ const Calendar = () => {
 
   const modifiers = {
     hasActivity: (date: Date) => hasActivityOnDate(date)
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case "musculation":
-        return <Dumbbell className="h-4 w-4" />;
-      case "abdos":
-        return <Timer className="h-4 w-4" />;
-      default:
-        return null;
-    }
   };
 
   return (
@@ -105,30 +124,29 @@ const Calendar = () => {
                   <SelectContent>
                     <SelectItem value="musculation">Musculation</SelectItem>
                     <SelectItem value="abdos">Abdominaux</SelectItem>
+                    <SelectItem value="cardio">Cardio</SelectItem>
+                    <SelectItem value="autre">Autre</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Heures</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={hours}
-                    onChange={(e) => setHours(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Minutes</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    max="59"
-                    value={minutes}
-                    onChange={(e) => setMinutes(e.target.value)}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Nom de l'activité</Label>
+                <Input
+                  value={activityName}
+                  onChange={(e) => setActivityName(e.target.value)}
+                  placeholder="Ex: Séance jambes"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Durée (minutes)</Label>
+                <Input
+                  type="number"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  placeholder="Ex: 45"
+                />
               </div>
 
               <Button onClick={handleAddActivity} className="w-full">
@@ -154,22 +172,18 @@ const Calendar = () => {
                       key={activity.id}
                       className="flex items-center justify-between rounded-lg border p-3"
                     >
-                      <div className="flex items-center gap-2">
-                        {getActivityIcon(activity.type)}
-                        <div>
-                          <p className="text-sm font-medium capitalize">
-                            {activity.type}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {Math.floor(activity.duration / 60)}h{" "}
-                            {activity.duration % 60}min
-                          </p>
-                        </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">
+                          {activity.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {activity.type} - {activity.duration} minutes
+                        </p>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => deleteActivity(activity.id)}
+                        onClick={() => handleDeleteActivity(activity.id)}
                       >
                         Supprimer
                       </Button>
