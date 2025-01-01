@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
-import { useActivities } from "@/hooks/useActivities";
+import { Activity } from "@/hooks/useActivities";
 import { Dumbbell, Timer } from "lucide-react";
 import { useRunStore } from "@/stores/runStore";
+import { useActivityStore } from "@/stores/activityStore";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -23,7 +24,7 @@ const Calendar = () => {
   const [minutes, setMinutes] = useState("");
   const { toast } = useToast();
   const runs = useRunStore(state => state.runs);
-  const { activities, addActivity, deleteActivity } = useActivities(runs);
+  const { activities, addActivity, deleteActivity } = useActivityStore();
 
   const handleAddActivity = () => {
     if (!date || (!hours && !minutes)) {
