@@ -29,6 +29,24 @@ const EditRunDialog = ({ run, isOpen, onOpenChange, onUpdate }: EditRunDialogPro
 
     const duration = hours * 3600 + minutes * 60 + seconds;
 
+    // Mettre à jour l'activité cardio correspondante dans le calendrier
+    const activities = JSON.parse(localStorage.getItem("sports-activities") || "[]");
+    const oldDate = new Date(run.date).toISOString().split('T')[0];
+    const totalMinutes = hours * 60 + minutes + Math.ceil(seconds / 60);
+
+    const updatedActivities = activities.map((activity: any) => {
+      if (activity.type === "cardio" && new Date(activity.date).toISOString().split('T')[0] === oldDate) {
+        return {
+          ...activity,
+          date: date,
+          duration: totalMinutes,
+        };
+      }
+      return activity;
+    });
+
+    localStorage.setItem("sports-activities", JSON.stringify(updatedActivities));
+
     onUpdate(run.id, {
       name,
       distance,

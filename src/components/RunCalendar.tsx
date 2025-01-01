@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Dumbbell, Activity, Run } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -9,34 +9,65 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Run } from "@/types/running";
+import { Run as RunType } from "@/types/running";
 import { Badge } from "@/components/ui/badge";
 
 interface RunCalendarProps {
-  runs: Run[];
+  runs: RunType[];
 }
 
 const RunCalendar = ({ runs }: RunCalendarProps) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  // Créer un Set des dates où il y a eu des courses (en format ISO string pour la comparaison)
-  const runDates = new Set(
-    runs.map((run) => new Date(run.date).toISOString().split('T')[0])
-  );
-
-  // Fonction pour vérifier si une date donnée a une course
-  const hasRunOnDate = (date: Date) => {
-    return runDates.has(date.toISOString().split('T')[0]);
+  // Récupérer les activités du localStorage
+  const getActivities = () => {
+    const savedActivities = localStorage.getItem("sports-activities");
+    if (savedActivities) {
+      return JSON.parse(savedActivities).map((activity: any) => ({
+        ...activity,
+        date: new Date(activity.date)
+      }));
+    }
+    return [];
   };
 
-  // Fonction pour styliser les jours avec des courses
-  const modifiersStyles = {
-    hasRun: { backgroundColor: "hsl(var(--primary))", color: "white", borderRadius: "50%" }
+  const activities = getActivities();
+
+  // Fonction pour obtenir les activités pour une date donnée
+  const getActivitiesForDate = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    
+    // Obtenir les courses pour cette date
+    const runsForDate = runs.filter(
+      run => new Date(run.date).toISOString().split('T')[0] === dateStr
+    );
+    
+    // Obtenir les autres activités pour cette date
+    const otherActivities = activities.filter(
+      (activity: any) => new Date(activity.date).toISOString().split('T')[0] === dateStr
+    );
+
+    return {
+      hasRuns: runsForDate.length > 0,
+      hasWorkout: otherActivities.some((a: any) => a.type === "musculation"),
+      hasAbs: otherActivities.some((a: any) => a.type === "abdos"),
+    };
   };
 
-  // Fonction pour ajouter le modificateur aux jours avec des courses
-  const modifiers = {
-    hasRun: (date: Date) => hasRunOnDate(date)
+  // Fonction pour afficher les icônes du jour
+  const DayContent = (day: Date) => {
+    const activities = getActivitiesForDate(day);
+    
+    return (
+      <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute top-0 left-0 right-0 flex justify-center gap-1">
+          {activities.hasRuns && <Run className="h-3 w-3" />}
+          {activities.hasWorkout && <Dumbbell className="h-3 w-3" />}
+          {activities.hasAbs && <Activity className="h-3 w-3" />}
+        </div>
+        <span className="mt-3">{day.getDate()}</span>
+      </div>
+    );
   };
 
   return (
@@ -48,21 +79,22 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Calendrier des courses</SheetTitle>
+          <SheetTitle>Calendrier des activités</SheetTitle>
         </SheetHeader>
         <div className="py-4">
           <Calendar
             mode="single"
             selected={date}
             onSelect={setDate}
-            modifiers={modifiers}
-            modifiersStyles={modifiersStyles}
+            components={{
+              DayContent: ({ date }) => DayContent(date),
+            }}
             className="rounded-md border"
           />
         </div>
-        {date && hasRunOnDate(date) && (
+        {date && (
           <div className="space-y-4">
-            <h3 className="font-medium">Courses du {date.toLocaleDateString()}</h3>
+            <h3 className="font-medium">Activités du {date.toLocaleDateString()}</h3>
             <div className="space-y-2">
               {runs
                 .filter(
@@ -76,7 +108,8 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
                     className="flex items-center justify-between rounded-lg border p-3"
                   >
                     <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">
+                      <p className="text-sm font-medium leading-none flex items-center gap-2">
+                        <Run className="h-4 w-4" />
                         {run.name || "Course sans nom"}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -86,6 +119,29 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
                     <Badge variant="secondary">
                       {run.speed.toFixed(1)} {run.unit}/h
                     </Badge>
+                  </div>
+                ))}
+              {activities
+                .filter(
+                  (activity: any) =>
+                    new Date(activity.date).toISOString().split('T')[0] ===
+                    date.toISOString().split('T')[0]
+                )
+                .map((activity: any) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none flex items-center gap-2">
+                        {activity.type === "musculation" && <Dumbbell className="h-4 w-4" />}
+                        {activity.type === "abdos" && <Activity className="h-4 w-4" />}
+                        {activity.type}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {activity.duration} minutes
+                      </p>
+                    </div>
                   </div>
                 ))}
             </div>
