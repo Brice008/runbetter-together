@@ -21,7 +21,10 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
 
   // Créer un Set des dates où il y a eu des courses (en format ISO string pour la comparaison)
   const runDates = new Set(
-    runs.map((run) => new Date(run.date).toISOString().split('T')[0])
+    runs.map((run) => {
+      const date = new Date(run.date);
+      return date.toISOString().split('T')[0];
+    })
   );
 
   // Fonction pour vérifier si une date donnée a une course
@@ -37,6 +40,14 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
   // Fonction pour ajouter le modificateur aux jours avec des courses
   const modifiers = {
     hasRun: (date: Date) => hasRunOnDate(date)
+  };
+
+  // Fonction pour obtenir les courses pour une date donnée
+  const getRunsForDate = (date: Date) => {
+    return runs.filter((run) => {
+      const runDate = new Date(run.date);
+      return runDate.toISOString().split('T')[0] === date.toISOString().split('T')[0];
+    });
   };
 
   return (
@@ -64,30 +75,24 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
           <div className="space-y-4">
             <h3 className="font-medium">Courses du {date.toLocaleDateString()}</h3>
             <div className="space-y-2">
-              {runs
-                .filter(
-                  (run) =>
-                    new Date(run.date).toISOString().split('T')[0] ===
-                    date.toISOString().split('T')[0]
-                )
-                .map((run) => (
-                  <div
-                    key={run.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
-                  >
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {run.name || "Course sans nom"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {run.distance.toFixed(2)} {run.unit}
-                      </p>
-                    </div>
-                    <Badge variant="secondary">
-                      {run.speed.toFixed(1)} {run.unit}/h
-                    </Badge>
+              {getRunsForDate(date).map((run) => (
+                <div
+                  key={run.id}
+                  className="flex items-center justify-between rounded-lg border p-3"
+                >
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {run.name || "Course sans nom"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {run.distance.toFixed(2)} {run.unit}
+                    </p>
                   </div>
-                ))}
+                  <Badge variant="secondary">
+                    {run.speed.toFixed(1)} {run.unit}/h
+                  </Badge>
+                </div>
+              ))}
             </div>
           </div>
         )}
