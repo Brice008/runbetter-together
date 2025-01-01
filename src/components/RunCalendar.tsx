@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Dumbbell, Activity, Runner } from "lucide-react";
+import { Calendar as CalendarIcon, Dumbbell, Activity, Running } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -61,7 +61,7 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
     return (
       <div className="relative w-full h-full flex items-center justify-center">
         <div className="absolute top-0 left-0 right-0 flex justify-center gap-1">
-          {activities.hasRuns && <Runner className="h-3 w-3" />}
+          {activities.hasRuns && <Running className="h-3 w-3" />}
           {activities.hasWorkout && <Dumbbell className="h-3 w-3" />}
           {activities.hasAbs && <Activity className="h-3 w-3" />}
         </div>
@@ -109,7 +109,7 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
                   >
                     <div className="space-y-1">
                       <p className="text-sm font-medium leading-none flex items-center gap-2">
-                        <Runner className="h-4 w-4" />
+                        <Running className="h-4 w-4" />
                         {run.name || "Course sans nom"}
                       </p>
                       <p className="text-sm text-muted-foreground">
