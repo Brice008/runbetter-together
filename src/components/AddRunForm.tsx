@@ -56,19 +56,6 @@ const AddRunForm = ({ onSubmit }: AddRunFormProps) => {
       date: new Date(formData.date), // Assure que c'est bien un objet Date
     };
 
-    // Ajouter automatiquement l'activité cardio au calendrier
-    const totalMinutes = formData.hours * 60 + formData.minutes + Math.ceil(formData.seconds / 60);
-    const activities = JSON.parse(localStorage.getItem("sports-activities") || "[]");
-    
-    const newActivity = {
-      id: crypto.randomUUID(),
-      date: submissionData.date,
-      type: "cardio",
-      duration: totalMinutes,
-    };
-    
-    localStorage.setItem("sports-activities", JSON.stringify([...activities, newActivity]));
-
     onSubmit(submissionData);
     
     // Réinitialiser le formulaire
