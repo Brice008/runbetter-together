@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import RunningStats from "@/components/RunningStats";
-import ActivityStats from "@/components/ActivityStats";
 import { Run } from "@/types/running";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 const STORAGE_KEY = "running-tracker-runs";
-const ACTIVITIES_STORAGE_KEY = "sports-activities";
 
 const Stats = () => {
   const [runs, setRuns] = useState<Run[]>([]);
@@ -33,8 +31,6 @@ const Stats = () => {
         </Link>
         <h1 className="text-3xl sm:text-4xl font-bold">Statistiques</h1>
       </div>
-      
-      <ActivityStats />
       
       {runs.length > 0 ? (
         <RunningStats runs={runs} />
