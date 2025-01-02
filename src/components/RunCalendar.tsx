@@ -19,10 +19,17 @@ interface RunCalendarProps {
 const RunCalendar = ({ runs }: RunCalendarProps) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
+  // Fonction pour soustraire un jour à une date
+  const subtractOneDay = (date: Date): Date => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() - 1);
+    return newDate;
+  };
+
   // Créer un Set des dates où il y a eu des courses (en format ISO string pour la comparaison)
   const runDates = new Set(
     runs.map((run) => {
-      const date = new Date(run.date);
+      const date = subtractOneDay(new Date(run.date));
       return date.toISOString().split('T')[0];
     })
   );
@@ -45,7 +52,7 @@ const RunCalendar = ({ runs }: RunCalendarProps) => {
   // Fonction pour obtenir les courses pour une date donnée
   const getRunsForDate = (date: Date) => {
     return runs.filter((run) => {
-      const runDate = new Date(run.date);
+      const runDate = subtractOneDay(new Date(run.date));
       return runDate.toISOString().split('T')[0] === date.toISOString().split('T')[0];
     });
   };
