@@ -1,7 +1,9 @@
+export type ActivityType = 'running' | 'musculation' | 'abdo';
+
 export interface Activity {
   id: string;
+  type: ActivityType;
   date: Date;
-  type: 'cardio' | 'musculation' | 'autre';
-  name: string;
-  duration: number;
+  duration: number; // en minutes
+  name?: string;
 }
