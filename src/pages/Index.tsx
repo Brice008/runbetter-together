@@ -9,36 +9,22 @@ import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart3, TrendingUp, Target, Calendar } from "lucide-react";
-
-const STORAGE_KEY = "running-tracker-runs";
+import { useRunStore } from "@/stores/runStore";
 
 const Index = () => {
-  const [runs, setRuns] = useState<Run[]>([]);
+  const { runs, addRun, deleteRun, updateRun, loadRuns } = useRunStore();
   const { toast } = useToast();
 
-  // Charger les courses depuis le localStorage au démarrage
   useEffect(() => {
-    const savedRuns = localStorage.getItem(STORAGE_KEY);
-    if (savedRuns) {
-      const parsedRuns = JSON.parse(savedRuns).map((run: Run) => ({
-        ...run,
-        date: new Date(run.date)
-      }));
-      setRuns(parsedRuns);
-    }
-  }, []);
-
-  // Sauvegarder les courses dans le localStorage à chaque modification
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(runs));
-  }, [runs]);
+    loadRuns();
+  }, [loadRuns]);
 
   const handleAddRun = (formData: RunFormData) => {
     const duration = formData.hours * 3600 + formData.minutes * 60 + formData.seconds;
     const pace = calculatePace(formData.distance, duration);
     const speed = calculateSpeed(formData.distance, duration);
 
-    const newRun: Run = {
+    const newRun = {
       id: uuidv4(),
       date: formData.date,
       name: formData.name,
@@ -49,7 +35,7 @@ const Index = () => {
       unit: formData.unit,
     };
 
-    setRuns((prev) => [...prev, newRun]);
+    addRun(newRun);
     
     toast({
       title: "Course ajoutée",
@@ -58,7 +44,7 @@ const Index = () => {
   };
 
   const handleDeleteRun = (id: string) => {
-    setRuns((prev) => prev.filter((run) => run.id !== id));
+    deleteRun(id);
     toast({
       title: "Course supprimée",
       description: "La course a été supprimée avec succès",
@@ -66,25 +52,7 @@ const Index = () => {
   };
 
   const handleUpdateRun = (id: string, updatedRun: Partial<Run>) => {
-    setRuns((prev) =>
-      prev.map((run) => {
-        if (run.id === id) {
-          const duration = updatedRun.duration ?? run.duration;
-          const distance = updatedRun.distance ?? run.distance;
-          const pace = calculatePace(distance, duration);
-          const speed = calculateSpeed(distance, duration);
-
-          return {
-            ...run,
-            ...updatedRun,
-            pace,
-            speed,
-          };
-        }
-        return run;
-      })
-    );
-
+    updateRun(id, updatedRun);
     toast({
       title: "Course modifiée",
       description: "La course a été modifiée avec succès",
