@@ -4,8 +4,8 @@ import { Card } from "@/components/ui/card";
 import BackButton from "@/components/BackButton";
 import { useActivityStore } from "@/stores/activityStore";
 import AddActivityForm from "@/components/AddActivityForm";
-import { Dumbbell, Running } from "lucide-react";
-import { Activity } from "@/types/activity";
+import { Dumbbell, Activity, Timer } from "lucide-react";
+import { Activity as ActivityType } from "@/types/activity";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -33,10 +33,10 @@ const Calendar = () => {
   };
 
   // Function to get icon for activity type
-  const getActivityIcon = (type: Activity['type']) => {
+  const getActivityIcon = (type: ActivityType['type']) => {
     switch (type) {
       case 'running':
-        return <Running className="h-4 w-4" />;
+        return <Activity className="h-4 w-4" />;
       case 'musculation':
       case 'abdo':
         return <Dumbbell className="h-4 w-4" />;
