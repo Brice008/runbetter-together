@@ -86,8 +86,8 @@ const Stats = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 sm:py-8 space-y-6 sm:space-y-8">
-      <div className="flex items-center gap-4">
+    <div className="p-4 sm:py-8 space-y-6 sm:space-y-8">
+      <div className="flex items-center gap-4 px-2">
         <Link to="/">
           <Button variant="outline" size="icon" className="shrink-0">
             <ArrowLeft className="h-4 w-4" />
@@ -99,11 +99,19 @@ const Stats = () => {
       {runs.length > 0 ? (
         <>
           <RunningStats runs={runs} />
-          <Card className="p-4 sm:p-6">
-            <h2 className="text-xl font-semibold mb-4">Nombre de courses par mois</h2>
+          <Card className="p-2 sm:p-4">
+            <h2 className="text-xl font-semibold mb-4 px-2">Nombre de courses par mois</h2>
             <div className="h-[400px] sm:h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData}>
+                <BarChart 
+                  data={monthlyData}
+                  margin={{ 
+                    top: 5,
+                    right: 10,
+                    left: 0,
+                    bottom: 5 
+                  }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
                     dataKey="month" 
