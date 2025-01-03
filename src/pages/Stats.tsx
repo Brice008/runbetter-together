@@ -4,11 +4,16 @@ import { Run } from "@/types/running";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, isWithinInterval } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const STORAGE_KEY = "running-tracker-runs";
 
 const Stats = () => {
   const [runs, setRuns] = useState<Run[]>([]);
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
 
   useEffect(() => {
     const savedRuns = localStorage.getItem(STORAGE_KEY);
@@ -18,6 +23,30 @@ const Stats = () => {
         date: new Date(run.date)
       }));
       setRuns(parsedRuns);
+
+      // Calculer les données mensuelles
+      const last12Months = eachMonthOfInterval({
+        start: subMonths(new Date(), 11),
+        end: new Date()
+      });
+
+      const monthlyStats = last12Months.map(month => {
+        const monthInterval = {
+          start: startOfMonth(month),
+          end: endOfMonth(month)
+        };
+
+        const runsInMonth = parsedRuns.filter(run => 
+          isWithinInterval(new Date(run.date), monthInterval)
+        );
+
+        return {
+          month: format(month, 'MMM yyyy', { locale: fr }),
+          count: runsInMonth.length
+        };
+      });
+
+      setMonthlyData(monthlyStats);
     }
   }, []);
 
@@ -33,7 +62,35 @@ const Stats = () => {
       </div>
       
       {runs.length > 0 ? (
-        <RunningStats runs={runs} />
+        <>
+          <RunningStats runs={runs} />
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Nombre de courses par mois</h2>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 12 }}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    allowDecimals={false}
+                  />
+                  <Tooltip />
+                  <Bar 
+                    dataKey="count" 
+                    fill="#3B82F6" 
+                    name="Nombre de courses"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </>
       ) : (
         <p className="text-center text-gray-500 py-8">
           Aucune course enregistrée pour le moment
