@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, isWithinInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -85,7 +85,14 @@ const Stats = () => {
                     fill="#3B82F6" 
                     name="Nombre de courses"
                     radius={[4, 4, 0, 0]}
-                  />
+                  >
+                    <LabelList 
+                      dataKey="count" 
+                      position="top" 
+                      fill="#6B7280"
+                      fontSize={12}
+                    />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
