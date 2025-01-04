@@ -65,13 +65,13 @@ const Stats = () => {
           <RunningStats runs={runs} />
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Nombre de courses par mois</h2>
-            <div className="h-[300px] w-full -ml-8 -mr-4">
+            <div className="h-[300px] w-full -ml-8 -mr-8">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
                   data={monthlyData}
                   margin={{ 
                     top: 20,
-                    right: 10,
+                    right: 0,
                     left: -15,
                     bottom: 5 
                   }}
