@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, isWithinInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -76,7 +76,6 @@ const Stats = () => {
                     bottom: 5 
                   }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
                     dataKey="month" 
                     tick={{ fontSize: 12 }}
@@ -94,10 +93,11 @@ const Stats = () => {
                     radius={[4, 4, 0, 0]}
                   >
                     <LabelList 
-                      dataKey="count" 
-                      position="top" 
+                      dataKey="count"
+                      position="top"
                       fill="#6B7280"
                       fontSize={12}
+                      formatter={(value: number) => value > 0 ? value : ''}
                     />
                   </Bar>
                 </BarChart>
