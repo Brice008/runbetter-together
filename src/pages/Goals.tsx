@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import AddGoalDialog from "@/components/AddGoalDialog";
-import GoalsList from "@/components/GoalsList";
 import { Goal, GoalFolder } from "@/types/goals";
 import BackButton from "@/components/BackButton";
 import {
@@ -19,6 +18,8 @@ import {
 import FoldersList from "@/components/goals/FoldersList";
 import AddFolderDialog from "@/components/goals/AddFolderDialog";
 import { Folder, Plus } from "lucide-react";
+import GoalsSection from "@/components/goals/GoalsSection";
+import { DragEndEvent } from "@dnd-kit/core";
 
 const GOALS_STORAGE_KEY = "running-tracker-goals";
 const FOLDERS_STORAGE_KEY = "running-tracker-folders";
@@ -164,10 +165,23 @@ const Goals = () => {
           : goal
       )
     );
-    toast({
-      title: "Statut mis à jour",
-      description: "Le statut de l'objectif a été mis à jour",
-    });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setGoals((goals) => {
+        const oldIndex = goals.findIndex((goal) => goal.id === active.id);
+        const newIndex = goals.findIndex((goal) => goal.id === over.id);
+        
+        const newGoals = [...goals];
+        const [movedGoal] = newGoals.splice(oldIndex, 1);
+        newGoals.splice(newIndex, 0, movedGoal);
+        
+        return newGoals;
+      });
+    }
   };
 
   const filteredGoals = selectedFolderId
@@ -179,7 +193,7 @@ const Goals = () => {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <BackButton />
         <h1 className="text-3xl font-bold">Objectifs</h1>
         <div className="flex gap-2">
@@ -195,7 +209,7 @@ const Goals = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="space-y-4">
+        <div className="space-y-4 order-2 md:order-1">
           <h2 className="text-lg font-semibold">Dossiers</h2>
           <FoldersList
             folders={folders}
@@ -206,32 +220,30 @@ const Goals = () => {
           />
         </div>
 
-        <div className="md:col-span-3 space-y-8">
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Objectifs en cours</h2>
-            <GoalsList
-              goals={activeGoals}
-              onDelete={(id) => setGoalToDelete(id)}
-              onEdit={(goal) => {
-                setEditingGoal(goal);
-                setIsAddDialogOpen(true);
-              }}
-              onToggleComplete={handleToggleComplete}
-            />
-          </div>
+        <div className="md:col-span-3 space-y-8 order-1 md:order-2">
+          <GoalsSection
+            title="Objectifs en cours"
+            goals={activeGoals}
+            onDelete={(id) => setGoalToDelete(id)}
+            onEdit={(goal) => {
+              setEditingGoal(goal);
+              setIsAddDialogOpen(true);
+            }}
+            onToggleComplete={handleToggleComplete}
+            onDragEnd={handleDragEnd}
+          />
 
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Objectifs réussis</h2>
-            <GoalsList
-              goals={completedGoals}
-              onDelete={(id) => setGoalToDelete(id)}
-              onEdit={(goal) => {
-                setEditingGoal(goal);
-                setIsAddDialogOpen(true);
-              }}
-              onToggleComplete={handleToggleComplete}
-            />
-          </div>
+          <GoalsSection
+            title="Objectifs réussis"
+            goals={completedGoals}
+            onDelete={(id) => setGoalToDelete(id)}
+            onEdit={(goal) => {
+              setEditingGoal(goal);
+              setIsAddDialogOpen(true);
+            }}
+            onToggleComplete={handleToggleComplete}
+            onDragEnd={handleDragEnd}
+          />
         </div>
       </div>
 
