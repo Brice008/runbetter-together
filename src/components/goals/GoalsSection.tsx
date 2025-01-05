@@ -1,4 +1,4 @@
-import { Goal } from "@/types/goals";
+import { Goal, GoalFolder } from "@/types/goals";
 import GoalsList from "@/components/GoalsList";
 
 interface GoalsSectionProps {
@@ -7,6 +7,8 @@ interface GoalsSectionProps {
   onDelete: (id: string) => void;
   onEdit: (goal: Goal) => void;
   onToggleComplete: (id: string, completedAt?: Date) => void;
+  onMove?: (goalId: string, folderId?: string) => void;
+  folders?: GoalFolder[];
 }
 
 const GoalsSection = ({
@@ -15,6 +17,8 @@ const GoalsSection = ({
   onDelete,
   onEdit,
   onToggleComplete,
+  onMove,
+  folders = [],
 }: GoalsSectionProps) => {
   return (
     <div className="space-y-8">
@@ -25,6 +29,8 @@ const GoalsSection = ({
           onDelete={onDelete}
           onEdit={onEdit}
           onToggleComplete={onToggleComplete}
+          onMove={onMove}
+          folders={folders}
         />
       </div>
 
@@ -35,6 +41,8 @@ const GoalsSection = ({
           onDelete={onDelete}
           onEdit={onEdit}
           onToggleComplete={onToggleComplete}
+          onMove={onMove}
+          folders={folders}
         />
       </div>
     </div>
