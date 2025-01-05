@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import AddGoalDialog from "@/components/AddGoalDialog";
 import GoalsList from "@/components/GoalsList";
 import { Goal, GoalFolder } from "@/types/goals";
-import BackButton from "@/components/BackButton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import FoldersList from "@/components/goals/FoldersList";
 import AddFolderDialog from "@/components/goals/AddFolderDialog";
-import { Folder, Plus } from "lucide-react";
+import GoalsHeader from "@/components/goals/GoalsHeader";
 
 const GOALS_STORAGE_KEY = "running-tracker-goals";
 const FOLDERS_STORAGE_KEY = "running-tracker-folders";
@@ -179,23 +177,13 @@ const Goals = () => {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <BackButton />
-        <h1 className="text-3xl font-bold">Objectifs</h1>
-        <div className="flex gap-2">
-          <Button onClick={() => setIsAddFolderDialogOpen(true)}>
-            <Folder className="h-4 w-4 mr-2" />
-            Nouveau dossier
-          </Button>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nouvel objectif
-          </Button>
-        </div>
-      </div>
+      <GoalsHeader
+        onAddGoal={() => setIsAddDialogOpen(true)}
+        onAddFolder={() => setIsAddFolderDialogOpen(true)}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="space-y-4">
+        <div className="space-y-4 order-1 md:order-none">
           <h2 className="text-lg font-semibold">Dossiers</h2>
           <FoldersList
             folders={folders}
@@ -208,7 +196,7 @@ const Goals = () => {
 
         <div className="md:col-span-3 space-y-8">
           <div>
-            <h2 className="text-2xl font-semibold mb-4">Objectifs en cours</h2>
+            <h2 className="text-xl font-semibold mb-4">Objectifs en cours</h2>
             <GoalsList
               goals={activeGoals}
               onDelete={(id) => setGoalToDelete(id)}
@@ -221,7 +209,7 @@ const Goals = () => {
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold mb-4">Objectifs réussis</h2>
+            <h2 className="text-xl font-semibold mb-4">Objectifs réussis</h2>
             <GoalsList
               goals={completedGoals}
               onDelete={(id) => setGoalToDelete(id)}
