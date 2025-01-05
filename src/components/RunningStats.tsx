@@ -10,9 +10,18 @@ const RunningStats = ({ runs }: RunningStatsProps) => {
   const totalDistance = runs.reduce((acc, run) => acc + run.distance, 0);
   const averageSpeed = runs.reduce((acc, run) => acc + run.speed, 0) / runs.length;
   const averagePace = runs.reduce((acc, run) => acc + run.pace, 0) / runs.length;
+  const totalRuns = runs.length;
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-4">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Nombre de courses</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{totalRuns}</div>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Distance Totale</CardTitle>

@@ -7,4 +7,11 @@ export interface Goal {
   completed: boolean;
   deadline?: Date;
   completedAt?: Date;
+  folderId?: string;
+}
+
+export interface GoalFolder {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
