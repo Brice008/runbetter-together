@@ -1,18 +1,26 @@
 import { Goal } from "@/types/goals";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, CheckCircle, Circle } from "lucide-react";
+import { Pencil, Trash2, CheckCircle, Circle, FolderInput } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { calculatePace, calculateSpeed, formatPace } from "@/utils/calculations";
 import { Input } from "./ui/input";
+import { useState } from "react";
+import MoveGoalDialog from "./goals/MoveGoalDialog";
+import { GoalFolder } from "@/types/goals";
 
 interface GoalsListProps {
   goals: Goal[];
   onDelete: (id: string) => void;
   onEdit: (goal: Goal) => void;
   onToggleComplete: (id: string, completedAt?: Date) => void;
+  onMove?: (goalId: string, folderId?: string) => void;
+  folders?: GoalFolder[];
 }
 
-const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps) => {
+const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete, onMove, folders = [] }: GoalsListProps) => {
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
+
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "Non défini";
     const hours = Math.floor(seconds / 3600);
@@ -34,6 +42,11 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
 
   const handleCompletedDateChange = (goal: Goal, date: string) => {
     onToggleComplete(goal.id, new Date(date));
+  };
+
+  const handleMoveClick = (goalId: string) => {
+    setSelectedGoalId(goalId);
+    setMoveDialogOpen(true);
   };
 
   return (
@@ -87,6 +100,15 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  {onMove && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleMoveClick(goal.id)}
+                    >
+                      <FolderInput className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -106,6 +128,19 @@ const GoalsList = ({ goals, onDelete, onEdit, onToggleComplete }: GoalsListProps
             </Card>
           );
         })
+      )}
+
+      {onMove && (
+        <MoveGoalDialog
+          open={moveDialogOpen}
+          onOpenChange={setMoveDialogOpen}
+          folders={folders}
+          onMove={(folderId) => {
+            if (selectedGoalId && onMove) {
+              onMove(selectedGoalId, folderId);
+            }
+          }}
+        />
       )}
     </div>
   );

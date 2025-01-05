@@ -2,21 +2,12 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
 import AddGoalDialog from "@/components/AddGoalDialog";
-import GoalsList from "@/components/GoalsList";
 import { Goal, GoalFolder } from "@/types/goals";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import FoldersList from "@/components/goals/FoldersList";
 import AddFolderDialog from "@/components/goals/AddFolderDialog";
 import GoalsHeader from "@/components/goals/GoalsHeader";
+import GoalsAlertDialogs from "@/components/goals/GoalsAlertDialogs";
+import GoalsSection from "@/components/goals/GoalsSection";
 
 const GOALS_STORAGE_KEY = "running-tracker-goals";
 const FOLDERS_STORAGE_KEY = "running-tracker-folders";
@@ -105,6 +96,20 @@ const Goals = () => {
     });
   };
 
+  const handleMoveGoal = (goalId: string, folderId?: string) => {
+    setGoals((prev) =>
+      prev.map((goal) =>
+        goal.id === goalId
+          ? { ...goal, folderId }
+          : goal
+      )
+    );
+    toast({
+      title: "Objectif déplacé",
+      description: "L'objectif a été déplacé avec succès",
+    });
+  };
+
   const handleAddFolder = (name: string) => {
     const newFolder: GoalFolder = {
       id: uuidv4(),
@@ -182,8 +187,8 @@ const Goals = () => {
         onAddFolder={() => setIsAddFolderDialogOpen(true)}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="space-y-4 order-1 md:order-none">
+      <div className="grid grid-cols-1 gap-6">
+        <div className="space-y-4">
           <h2 className="text-lg font-semibold">Dossiers</h2>
           <FoldersList
             folders={folders}
@@ -194,33 +199,18 @@ const Goals = () => {
           />
         </div>
 
-        <div className="md:col-span-3 space-y-8">
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Objectifs en cours</h2>
-            <GoalsList
-              goals={activeGoals}
-              onDelete={(id) => setGoalToDelete(id)}
-              onEdit={(goal) => {
-                setEditingGoal(goal);
-                setIsAddDialogOpen(true);
-              }}
-              onToggleComplete={handleToggleComplete}
-            />
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Objectifs réussis</h2>
-            <GoalsList
-              goals={completedGoals}
-              onDelete={(id) => setGoalToDelete(id)}
-              onEdit={(goal) => {
-                setEditingGoal(goal);
-                setIsAddDialogOpen(true);
-              }}
-              onToggleComplete={handleToggleComplete}
-            />
-          </div>
-        </div>
+        <GoalsSection
+          activeGoals={activeGoals}
+          completedGoals={completedGoals}
+          onDelete={(id) => setGoalToDelete(id)}
+          onEdit={(goal) => {
+            setEditingGoal(goal);
+            setIsAddDialogOpen(true);
+          }}
+          onToggleComplete={handleToggleComplete}
+          onMove={handleMoveGoal}
+          folders={folders}
+        />
       </div>
 
       <AddGoalDialog
@@ -237,39 +227,14 @@ const Goals = () => {
         folder={editingFolder}
       />
 
-      <AlertDialog open={!!goalToDelete} onOpenChange={() => setGoalToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action ne peut pas être annulée. Cet objectif sera définitivement supprimé.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={() => goalToDelete && handleDeleteGoal(goalToDelete)}>
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={!!folderToDelete} onOpenChange={() => setFolderToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action ne peut pas être annulée. Ce dossier et tous ses objectifs seront définitivement supprimés.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={() => folderToDelete && handleDeleteFolder(folderToDelete)}>
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <GoalsAlertDialogs
+        goalToDelete={goalToDelete}
+        folderToDelete={folderToDelete}
+        onGoalDeleteConfirm={handleDeleteGoal}
+        onFolderDeleteConfirm={handleDeleteFolder}
+        onGoalDeleteCancel={() => setGoalToDelete(null)}
+        onFolderDeleteCancel={() => setFolderToDelete(null)}
+      />
     </div>
   );
 };
