@@ -1,23 +1,13 @@
-import { useState, useEffect } from "react";
 import BackButton from "@/components/BackButton";
 import ProgressSection from "@/components/ProgressSection";
-import { Run } from "@/types/running";
-
-const STORAGE_KEY = "running-tracker-runs";
+import { useRunStore } from "@/stores/runStore";
+import { useLoadUserData } from "@/hooks/useLoadUserData";
 
 const Progress = () => {
-  const [runs, setRuns] = useState<Run[]>([]);
-
-  useEffect(() => {
-    const savedRuns = localStorage.getItem(STORAGE_KEY);
-    if (savedRuns) {
-      const parsedRuns = JSON.parse(savedRuns).map((run: Run) => ({
-        ...run,
-        date: new Date(run.date)
-      }));
-      setRuns(parsedRuns);
-    }
-  }, []);
+  const { runs } = useRunStore();
+  
+  // Load user data when authenticated
+  useLoadUserData();
 
   const veryShortRuns = runs.filter(run => run.distance <= 4);
   const shortRuns = runs.filter(run => run.distance > 4 && run.distance <= 5);

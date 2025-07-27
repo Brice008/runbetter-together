@@ -11,54 +11,78 @@ import { useToast } from "@/hooks/use-toast";
 import { BarChart3, TrendingUp, Target, Calendar, LogOut } from "lucide-react";
 import { useRunStore } from "@/stores/runStore";
 import { useAuth } from "@/hooks/useAuth";
+import { useLoadUserData } from "@/hooks/useLoadUserData";
 
 const Index = () => {
-  const { runs, addRun, deleteRun, updateRun, loadRuns } = useRunStore();
+  const { runs, addRun, deleteRun, updateRun } = useRunStore();
   const { toast } = useToast();
   const { signOut } = useAuth();
+  
+  // Load user data when authenticated
+  useLoadUserData();
 
-  useEffect(() => {
-    loadRuns();
-  }, [loadRuns]);
+  const handleAddRun = async (formData: RunFormData) => {
+    try {
+      const duration = formData.hours * 3600 + formData.minutes * 60 + formData.seconds;
+      const pace = calculatePace(formData.distance, duration);
+      const speed = calculateSpeed(formData.distance, duration);
 
-  const handleAddRun = (formData: RunFormData) => {
-    const duration = formData.hours * 3600 + formData.minutes * 60 + formData.seconds;
-    const pace = calculatePace(formData.distance, duration);
-    const speed = calculateSpeed(formData.distance, duration);
+      const newRun = {
+        id: uuidv4(),
+        date: formData.date,
+        name: formData.name,
+        distance: formData.distance,
+        duration,
+        pace,
+        speed,
+        unit: formData.unit,
+      };
 
-    const newRun = {
-      id: uuidv4(),
-      date: formData.date,
-      name: formData.name,
-      distance: formData.distance,
-      duration,
-      pace,
-      speed,
-      unit: formData.unit,
-    };
-
-    addRun(newRun);
-    
-    toast({
-      title: "Course ajoutée",
-      description: "La course a été enregistrée avec succès",
-    });
+      await addRun(newRun);
+      
+      toast({
+        title: "Course ajoutée",
+        description: "La course a été enregistrée avec succès",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la course",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteRun = (id: string) => {
-    deleteRun(id);
-    toast({
-      title: "Course supprimée",
-      description: "La course a été supprimée avec succès",
-    });
+  const handleDeleteRun = async (id: string) => {
+    try {
+      await deleteRun(id);
+      toast({
+        title: "Course supprimée",
+        description: "La course a été supprimée avec succès",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la course",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateRun = (id: string, updatedRun: Partial<Run>) => {
-    updateRun(id, updatedRun);
-    toast({
-      title: "Course modifiée",
-      description: "La course a été modifiée avec succès",
-    });
+  const handleUpdateRun = async (id: string, updatedRun: Partial<Run>) => {
+    try {
+      await updateRun(id, updatedRun);
+      toast({
+        title: "Course modifiée",
+        description: "La course a été modifiée avec succès",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier la course",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSignOut = async () => {

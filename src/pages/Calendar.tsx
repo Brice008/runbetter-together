@@ -4,10 +4,14 @@ import { Card } from "@/components/ui/card";
 import BackButton from "@/components/BackButton";
 import ActivityList from "@/components/calendar/ActivityList";
 import { useRunStore } from "@/stores/runStore";
+import { useLoadUserData } from "@/hooks/useLoadUserData";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { runs } = useRunStore();
+  
+  // Load user data when authenticated
+  useLoadUserData();
 
   // Create a Set of dates with activities
   const activityDates = new Set(

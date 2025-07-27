@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import RunningStats from "@/components/RunningStats";
-import { Run } from "@/types/running";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -8,22 +7,18 @@ import { Card } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, isWithinInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
-
-const STORAGE_KEY = "running-tracker-runs";
+import { useRunStore } from "@/stores/runStore";
+import { useLoadUserData } from "@/hooks/useLoadUserData";
 
 const Stats = () => {
-  const [runs, setRuns] = useState<Run[]>([]);
+  const { runs } = useRunStore();
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  
+  // Load user data when authenticated
+  useLoadUserData();
 
   useEffect(() => {
-    const savedRuns = localStorage.getItem(STORAGE_KEY);
-    if (savedRuns) {
-      const parsedRuns = JSON.parse(savedRuns).map((run: Run) => ({
-        ...run,
-        date: new Date(run.date)
-      }));
-      setRuns(parsedRuns);
-
+    if (runs.length > 0) {
       const last12Months = eachMonthOfInterval({
         start: subMonths(new Date(), 11),
         end: new Date()
@@ -35,7 +30,7 @@ const Stats = () => {
           end: endOfMonth(month)
         };
 
-        const runsInMonth = parsedRuns.filter(run => 
+        const runsInMonth = runs.filter(run => 
           isWithinInterval(new Date(run.date), monthInterval)
         );
 
@@ -47,7 +42,7 @@ const Stats = () => {
 
       setMonthlyData(monthlyStats);
     }
-  }, []);
+  }, [runs]);
 
   return (
     <div className="container mx-auto p-4 sm:py-8 space-y-6 sm:space-y-8">
