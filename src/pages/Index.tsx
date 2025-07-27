@@ -8,12 +8,14 @@ import ProgressChart from "@/components/ProgressChart";
 import { Run, RunFormData } from "@/types/running";
 import { calculatePace, calculateSpeed } from "@/utils/calculations";
 import { useToast } from "@/hooks/use-toast";
-import { BarChart3, TrendingUp, Target, Calendar } from "lucide-react";
+import { BarChart3, TrendingUp, Target, Calendar, LogOut } from "lucide-react";
 import { useRunStore } from "@/stores/runStore";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const { runs, addRun, deleteRun, updateRun, loadRuns } = useRunStore();
   const { toast } = useToast();
+  const { signOut } = useAuth();
 
   useEffect(() => {
     loadRuns();
@@ -59,6 +61,17 @@ const Index = () => {
     });
   };
 
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Erreur de déconnexion",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 sm:py-8 space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -88,6 +101,14 @@ const Index = () => {
               Calendrier
             </Button>
           </Link>
+          <Button 
+            variant="outline" 
+            onClick={handleSignOut}
+            className="w-full sm:w-auto flex items-center justify-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Déconnexion
+          </Button>
         </div>
       </div>
       
